@@ -14,7 +14,7 @@ const Chat = ({ user, selectedUser }) => {
   const scrollRef = useRef(null);
   const menuRef = useRef(null);
 
-  const API = import.meta.env.VITE_BACKEND_URL || "https://social-server-hhnd.onrender.com";
+  const API = import.meta.env.VITE_BACKEND_URL || "https://social-server-2-tahg.onrender.com";
 
   const emojis = ["😀","😂","😍","😎","😭","🔥","❤️","👍","🎉","😡"];
 
