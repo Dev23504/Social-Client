@@ -4,13 +4,13 @@ const Suggestion = ({ user }) => {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/users/${user.username}`)
+    fetch(`https://social-server-hhnd.onrender.com/users/${user.username}`)
       .then(res => res.json())
       .then(data => setUsers(data));
   }, []);
 
   const followUser = async (target) => {
-    await fetch("http://localhost:5000/follow", {
+    await fetch("https://social-server-hhnd.onrender.com/follow", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

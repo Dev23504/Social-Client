@@ -17,7 +17,7 @@ const Chat = ({ user, selectedUser }) => {
   const emojis = ["😀","😂","😍","😎","🔥","👍","❤️","😢","😡","🎉"];
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:5000", {
+    socketRef.current = io("https://social-server-hhnd.onrender.com", {
       transports: ["websocket"],
     });
 
@@ -44,7 +44,7 @@ const Chat = ({ user, selectedUser }) => {
 
     socketRef.current.emit("join", user.username);
 
-    fetch(`http://localhost:5000/messages/${user.username}/${currentChat}`)
+    fetch(`https://social-server-hhnd.onrender.com/messages/${user.username}/${currentChat}`)
       .then(res => res.json())
       .then(data => setMessages(data))
       .catch(() => setMessages([]));
