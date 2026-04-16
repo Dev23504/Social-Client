@@ -29,7 +29,7 @@ const Chat = ({ user, selectedUser }) => {
     socketRef.current.emit("join", user.username);
 
     return () => {
-      socketRef.current?.disconnect();
+      socketRef.current.disconnect();
     };
   }, [user]);
 
@@ -65,7 +65,7 @@ const Chat = ({ user, selectedUser }) => {
     socket.on("receiveMessage", handler);
 
     return () => socket.off("receiveMessage", handler);
-  }, [currentChat]);
+  }, [currentChat, user]);
 
   const sendMessage = () => {
     if (!message.trim() || !currentChat) return;
@@ -100,7 +100,6 @@ const Chat = ({ user, selectedUser }) => {
   return (
     <div className="flex h-screen bg-gray-100">
 
-      {/* USERS */}
       <div className="w-1/3 bg-white border-r">
         {users.map((u, i) => (
           <div
@@ -113,7 +112,6 @@ const Chat = ({ user, selectedUser }) => {
         ))}
       </div>
 
-      {/* CHAT BOX */}
       <div className="w-2/3 flex flex-col">
 
         {currentChat ? (
@@ -127,10 +125,13 @@ const Chat = ({ user, selectedUser }) => {
                 <div
                   key={i}
                   className={`flex ${
-                    msg.sender === user.username ? "justify-end" : "justify-start"
+                    msg.sender === user.username
+                      ? "justify-end"
+                      : "justify-start"
                   }`}
                 >
                   <div className="px-3 py-2 rounded bg-blue-500 text-white max-w-[70%]">
+
                     {msg.text && <p>{msg.text}</p>}
 
                     {msg.type === "image" && (
@@ -142,6 +143,7 @@ const Chat = ({ user, selectedUser }) => {
                         <source src={msg.file} />
                       </video>
                     )}
+
                   </div>
                 </div>
               ))}
@@ -173,6 +175,7 @@ const Chat = ({ user, selectedUser }) => {
               >
                 Send
               </button>
+
             </div>
           </>
         ) : (
