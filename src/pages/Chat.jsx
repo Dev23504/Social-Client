@@ -12,6 +12,7 @@ const Chat = ({ user, selectedUser }) => {
   const socketRef = useRef(null);
   const fileInputRef = useRef(null);
   const scrollRef = useRef(null);
+  const menuRef = useRef(null);
 
   const API = import.meta.env.VITE_BACKEND_URL || "https://social-server-hhnd.onrender.com";
 
@@ -63,6 +64,16 @@ const Chat = ({ user, selectedUser }) => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const sendMessage = () => {
     if (!message.trim() || !currentChat) return;
 
@@ -70,6 +81,7 @@ const Chat = ({ user, selectedUser }) => {
       sender: user.username,
       receiver: currentChat,
       text: message,
+      time: new Date().toLocaleTimeString()
     });
 
     setMessage("");
@@ -93,6 +105,7 @@ const Chat = ({ user, selectedUser }) => {
         receiver: currentChat,
         file: reader.result,
         type: file.type.startsWith("image") ? "image" : "video",
+        time: new Date().toLocaleTimeString()
       });
     };
 
@@ -100,6 +113,7 @@ const Chat = ({ user, selectedUser }) => {
   };
 
   const getAvatar = (u) => {
+    if (!u || !u.username) return "https://ui-avatars.com/api/?name=User";
     return u.profilePic || `https://ui-avatars.com/api/?name=${u.username}&background=random`;
   };
 
@@ -108,10 +122,7 @@ const Chat = ({ user, selectedUser }) => {
 
       <div className="w-1/4 border-r bg-white">
         <div className="p-4 font-bold text-lg border-b flex items-center gap-3">
-          <img
-            src={getAvatar(user)}
-            className="w-10 h-10 rounded-full object-cover"
-          />
+          <img src={getAvatar(user)} className="w-10 h-10 rounded-full object-cover" />
           {user.username}
         </div>
 
@@ -119,14 +130,11 @@ const Chat = ({ user, selectedUser }) => {
           <div
             key={i}
             onClick={() => setCurrentChat(u.username)}
-            className={`p-4 cursor-pointer flex items-center gap-3 ${
+            className={`p-4 cursor-pointer flex items-center gap-3 transition ${
               currentChat === u.username ? "bg-gray-200" : "hover:bg-gray-100"
             }`}
           >
-            <img
-              src={getAvatar(u)}
-              className="w-10 h-10 rounded-full object-cover"
-            />
+            <img src={getAvatar(u)} className="w-10 h-10 rounded-full object-cover" />
             <span>{u.username}</span>
           </div>
         ))}
@@ -138,7 +146,7 @@ const Chat = ({ user, selectedUser }) => {
           <>
             <div className="p-4 border-b bg-white font-semibold flex items-center gap-3">
               <img
-                src={getAvatar(users.find(u => u.username === currentChat) || {})}
+                src={getAvatar(users.find(u => u.username === currentChat))}
                 className="w-10 h-10 rounded-full object-cover"
               />
               {currentChat}
@@ -149,9 +157,7 @@ const Chat = ({ user, selectedUser }) => {
                 <div
                   key={i}
                   className={`flex ${
-                    msg.sender === user.username
-                      ? "justify-end"
-                      : "justify-start"
+                    msg.sender === user.username ? "justify-end" : "justify-start"
                   }`}
                 >
                   <div
@@ -172,6 +178,12 @@ const Chat = ({ user, selectedUser }) => {
                         <source src={msg.file} />
                       </video>
                     )}
+
+                    {msg.time && (
+                      <p className="text-xs mt-1 opacity-70 text-right">
+                        {msg.time}
+                      </p>
+                    )}
                   </div>
                 </div>
               ))}
@@ -188,8 +200,10 @@ const Chat = ({ user, selectedUser }) => {
               </button>
 
               {showMenu && (
-                <div className="absolute bottom-14 left-2 bg-white shadow-lg rounded-xl p-3 flex flex-col gap-3">
-
+                <div
+                  ref={menuRef}
+                  className="absolute bottom-14 left-2 bg-white shadow-lg rounded-xl p-3 flex flex-col gap-3"
+                >
                   <div className="grid grid-cols-5 gap-2 text-xl">
                     {emojis.map((e, i) => (
                       <button
@@ -209,16 +223,10 @@ const Chat = ({ user, selectedUser }) => {
                     <button onClick={() => handleFile("image")}><FaImage /></button>
                     <button onClick={() => handleFile("video")}><FaVideo /></button>
                   </div>
-
                 </div>
               )}
 
-              <input
-                type="file"
-                ref={fileInputRef}
-                className="hidden"
-                onChange={handleFileChange}
-              />
+              <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileChange} />
 
               <input
                 value={message}
@@ -230,7 +238,7 @@ const Chat = ({ user, selectedUser }) => {
 
               <button
                 onClick={sendMessage}
-                className="text-blue-500 font-semibold"
+                className="bg-blue-500 text-white px-4 py-2 rounded-full"
               >
                 Send
               </button>
